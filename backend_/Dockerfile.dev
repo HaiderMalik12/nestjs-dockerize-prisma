@@ -1,0 +1,21 @@
+FROM node:24-alpine3.21
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy Prisma schema separately (important for prisma generate)
+COPY prisma ./prisma
+
+# Copy rest of the code
+COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Expose API port
+EXPOSE 3000
+
+CMD sh -c "npx prisma migrate deploy && npm run start:dev"
